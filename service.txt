@@ -1,0 +1,1342 @@
+package com.onewifi.service;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import org.apache.commons.codec.binary.Base64;
+
+public class GenerateHash {
+ 
+	 public static void main(String[] args) throws Exception {
+
+		GenerateHash client = new GenerateHash();
+		System.out.println("Password Hash:"+client.generateHash(args[0]));		
+	 }
+	 
+	 public static String generateHash(String password) throws Exception {
+		 
+		String hashStr = null;
+		try {
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
+			md.reset();			
+			StringBuffer psd = new StringBuffer();
+			psd.append("bcc_onewifi");
+			psd.append(password);
+			md.update((psd.toString()).getBytes("UTF-8")); // Change this to "UTF-16" if needed
+			byte[] digest = md.digest();
+			hashStr = new String(Base64.encodeBase64(digest));
+		} catch (Exception e) {
+		  e.printStackTrace();
+		  throw e;
+		}
+		return hashStr; 
+	 
+	 }
+
+}
+package com.onewifi.service;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+import org.apache.http.HttpEntity;
+import net.sf.json.JSONObject;
+import org.apache.http.Header;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
+import java.io.UnsupportedEncodingException;
+
+public class GlocalmeClient {
+ 
+	 public static void main(String[] args) throws Exception {
+
+		GlocalmeClient client = new GlocalmeClient();
+		//client.invokeUserBinding();
+		client.invokeQuerySubUserListInfo();
+		client.invokeQuerySubUserInfo();
+		client.invokeQueryRealTimePositionInfo();
+		client.invokeQueryHisPositionListInfo();
+		client.invokeQueryUserPackageListInfo();
+		client.invokeQueryUserBillingListInfo();
+	 }
+	 
+	 /*private void invokeUserBinding() throws Exception {
+	
+		  String jsonStr = "{\"streamNo\":\"TESTT20150921174025000001\",\"timeStamp\":\"20150921174110\",\"partnerCode\":\"onewifi@bcc.com.sg\",\"userCode\":\"onewifi06@bcc.com.sg\",\"imei\":\"356166060827382\",\"password\":\"d307a600\",\"operateType\":\"0\"}";
+	*/  
+	public JSONObject invokeUserBinding(String partnerCode, String userCode, String imei, String password, String operatorType) throws Exception {
+	
+		  String jsonStr = "{\"streamNo\":\"TESTT20150921174025000001\",\"timeStamp\":\"20150921174110\",\"partnerCode\":\""+partnerCode+"\",\"userCode\":\""+userCode+"\",\"imei\":\""+imei+"\",\"password\":\""+password+"\",\"operateType\":\""+operatorType+"\"}";
+		  		  
+		  JSONObject retObj = getResponse(jsonStr, "http://59.152.232.156:8080/api/UserBinding");
+		  return retObj;
+	 }
+	 
+	 private void invokeQuerySubUserListInfo() throws Exception {
+		 
+		String jsonStr = "{\"streamNo\":\"TESTT20150921174025000001\",\"timeStamp\":\"20150921174110\",\"partnerCode\":\"onewifi@bcc.com.sg\",\"currentPage\":\"1\",\"perPageCount\":\"5\"}";
+		  
+		JSONObject retObj = getResponse(jsonStr, "http://59.152.232.156:8080/api/QuerySubUserListInfo");
+		System.out.println("\n\nHTTP POST Response:"+retObj.toString());
+		 
+	 }
+
+	 private void invokeQuerySubUserInfo() throws Exception {
+		 
+		String jsonStr = "{\"streamNo\":\"TESTT20150921174025000001\",\"timeStamp\":\"20150921174110\",\"partnerCode\":\"onewifi@bcc.com.sg\",\"userCode\":\"onewifi06@bcc.com.sg\",\"imei\":\"356166060827382\",\"queryType\":\"1\"}";
+		  
+		JSONObject retObj = getResponse(jsonStr, "http://59.152.232.156:8080/api/QuerySubUserInfo");
+		System.out.println("\n\nHTTP POST Response:"+retObj.toString());
+		 
+	 }
+
+	 private void invokeQueryRealTimePositionInfo() throws Exception {
+		 
+		String jsonStr = "{\"streamNo\":\"TESTT20150921174025000001\",\"timeStamp\":\"20150921174110\",\"partnerCode\":\"onewifi@bcc.com.sg\",\"userCode\":\"onewifi06@bcc.com.sg\",\"imei\":\"356166060827382\",\"queryType\":\"1\"}";
+		  
+		JSONObject retObj = getResponse(jsonStr, "http://59.152.232.156:8080/api/QueryRealTimePositionInfo");
+		System.out.println("\n\nHTTP POST Response:"+retObj.toString());
+		 
+	 }
+
+	 private void invokeQueryHisPositionListInfo() throws Exception {
+		 
+		String jsonStr = "{\"streamNo\":\"TESTT20150921174025000001\",\"timeStamp\":\"20150921174110\",\"partnerCode\":\"onewifi@bcc.com.sg\",\"userCode\":\"onewifi06@bcc.com.sg\",\"imei\":\"356166060827382\",\"queryType\":\"1\",\"bgTime\":\"20150921174110\",\"endTime\":\"20150921174110\",\"currentPage\":\"1\",\"perPageCount\":\"5\"}";
+		  
+		JSONObject retObj = getResponse(jsonStr, "http://59.152.232.156:8080/api/QueryHisPositionListInfo");
+		System.out.println("\n\nHTTP POST Response:"+retObj.toString());
+		 
+	 }
+
+	 private void invokeQueryUserPackageListInfo() throws Exception {
+		 
+		String jsonStr = "{\"streamNo\":\"TESTT20150921174025000001\",\"timeStamp\":\"20150921174110\",\"partnerCode\":\"onewifi@bcc.com.sg\",\"userCode\":\"onewifi06@bcc.com.sg\",\"bgTime\":\"20150921174110\",\"endTime\":\"20150921174110\",\"currentPage\":\"1\",\"perPageCount\":\"5\"}";
+		  
+		JSONObject retObj = getResponse(jsonStr, "http://59.152.232.156:8080/api/QueryUserPackageListInfo");
+		System.out.println("\n\nHTTP POST Response:"+retObj.toString());
+		 
+	 }
+
+	 private void invokeQueryUserBillingListInfo() throws Exception {
+		 
+		String jsonStr = "{\"streamNo\":\"TESTT20150921174025000001\",\"timeStamp\":\"20150921174110\",\"partnerCode\":\"onewifi@bcc.com.sg\",\"userCode\":\"onewifi06@bcc.com.sg\",\"bgTime\":\"20150921174110\",\"endTime\":\"20150921174110\",\"currentPage\":\"1\",\"perPageCount\":\"5\"}";
+		  
+		JSONObject retObj = getResponse(jsonStr, "http://59.152.232.156:8080/api/QueryUserBillingListInfo");
+		System.out.println("\n\nHTTP POST Response:"+retObj.toString());
+		 
+	 }
+
+	 private JSONObject getResponse(String jsonStr, String URL) throws Exception {
+	
+		JSONObject retObj = null;
+		try {
+			HttpClient client = new DefaultHttpClient();
+			System.out.println("\n\nHTTP URL:"+URL);
+			HttpPost post = new HttpPost(URL);
+
+			StringEntity input = new StringEntity(jsonStr, "UTF-8");  
+			input.setContentEncoding("UTF-8");
+			input.setContentType("application/json");   
+			post.setEntity(input);  
+			  
+			String factCode = "zIQbAaeg0v25GqDjKTQgsS6bz";		   
+			  
+			post.setHeader("keyCode", generateHash(jsonStr, factCode)); 
+			post.setHeader("Accept", "application/json");
+			post.setHeader("Content-type", "application/json");  
+			  
+			String reqSrc = EntityUtils.toString(post.getEntity());  
+			JSONObject reqObj = new JSONObject().fromObject(reqSrc);
+			System.out.println("\n\nHTTP POST Request:"+reqObj.toString());
+				  
+			HttpResponse response = client.execute(post);
+			  
+			HttpEntity entity = response.getEntity();
+			String retSrc = EntityUtils.toString(response.getEntity());   
+			retObj = new JSONObject().fromObject(retSrc);		
+		} catch(Exception ex) {
+			ex.printStackTrace();
+			throw ex;
+		}
+		return retObj;
+	 }
+	 
+	 private String generateHash(String jsonStr, String factCode) throws Exception {
+		 
+		String hashStr = null;
+		try {
+	      StringBuffer str = new StringBuffer();
+		  str.append(jsonStr);
+		  str.append(factCode);
+		  hashStr = DigestUtils.md5Hex(str.toString().getBytes("UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+		  e.printStackTrace();
+		  throw e;
+		}
+		return hashStr; 
+	 
+	 }
+
+}
+package com.onewifi.service;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.servlet.MultipartConfigElement;
+import javax.servlet.Servlet;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
+
+/**
+ * The MultipartMap. It simulates the <code>HttpServletRequest#getParameterXXX()</code> methods to
+ * ease the processing in <code>@MultipartConfig</code> servlets. You can access the normal request
+ * parameters by <code>{@link #getParameter(String)}</code> and you can access multiple request
+ * parameter values by <code>{@link #getParameterValues(String)}</code>.
+ * <p>
+ * On creation, the <code>MultipartMap</code> will put itself in the request scope, identified by
+ * the attribute name <code>parts</code>, so that you can access the parameters in EL by for example
+ * <code>${parts.fieldname}</code> where you would have used <code>${param.fieldname}</code>. In
+ * case of file fields, the <code>${parts.filefieldname}</code> returns a <code>{@link File}</code>.
+ * <p>
+ * It was a design decision to extend <code>HashMap&lt;String, Object&gt;</code> instead of having
+ * just <code>Map&lt;String, String[]&gt;</code> and <code>Map&lt;String, File&gt;</code>
+ * properties, because of the accessibility in Expression Language. Also, when the value is obtained
+ * by <code>{@link #get(Object)}</code>, as will happen in EL, then multiple parameter values will
+ * be converted from <code>String[]</code> to <code>List&lt;String&gt;</code>, so that you can use
+ * it in the JSTL <code>fn:contains</code> function.
+ *
+ * @author BalusC
+ * @link http://balusc.blogspot.com/2009/12/uploading-files-in-servlet-30.html
+ */
+public class MultiPartMap extends HashMap<String, Object> {
+
+    // Constants ----------------------------------------------------------------------------------
+
+    private static final String ATTRIBUTE_NAME = "parts";
+    private static final String CONTENT_DISPOSITION = "content-disposition";
+    private static final String CONTENT_DISPOSITION_FILENAME = "filename";
+    private static final String DEFAULT_ENCODING = "UTF-8";
+    private static final int DEFAULT_BUFFER_SIZE = 10240; // 10KB.
+
+    // Vars ---------------------------------------------------------------------------------------
+
+    private String encoding;
+    private String location;
+    private boolean multipartConfigured;
+
+    // Constructors -------------------------------------------------------------------------------
+
+    /**
+     * Construct multipart map based on the given multipart request and the servlet associated with
+     * the request. The file upload location will be extracted from <code>@MultipartConfig</code>
+     * of the servlet. When the encoding is not specified in the given request, then it will default
+     * to <tt>UTF-8</tt>.
+     * @param multipartRequest The multipart request to construct the multipart map for.
+     * @param servlet The servlet which is responsible for the given request.
+     * @throws ServletException If something fails at Servlet level.
+     * @throws IOException If something fails at I/O level.
+     */
+    public MultiPartMap(HttpServletRequest multipartRequest, Servlet servlet)
+        throws ServletException, IOException
+    {
+        this(multipartRequest, new MultipartConfigElement(
+            servlet.getClass().getAnnotation(MultipartConfig.class)).getLocation(), true);
+    }
+
+    /**
+     * Construct multipart map based on the given multipart request and file upload location. When
+     * the encoding is not specified in the given request, then it will default to <tt>UTF-8</tt>.
+     * @param multipartRequest The multipart request to construct the multipart map for.
+     * @param location The location to save uploaded files in.
+     * @throws ServletException If something fails at Servlet level.
+     * @throws IOException If something fails at I/O level.
+     */
+    public MultiPartMap(HttpServletRequest multipartRequest, String location)
+        throws ServletException, IOException
+    {
+        this(multipartRequest, location, false);
+    }
+
+    /**
+     * Global constructor.
+     */
+    private MultiPartMap
+        (HttpServletRequest multipartRequest, String location, boolean multipartConfigured)
+            throws ServletException, IOException
+    {
+        multipartRequest.setAttribute(ATTRIBUTE_NAME, this);
+
+        this.encoding = multipartRequest.getCharacterEncoding();
+        if (this.encoding == null) {
+            multipartRequest.setCharacterEncoding(this.encoding = DEFAULT_ENCODING);
+        }
+        this.location = location;
+        this.multipartConfigured = multipartConfigured;
+
+        for (Part part : multipartRequest.getParts()) {
+            String filename = getFilename(part);
+            if (filename == null) {
+                processTextPart(part);
+            } else if (!filename.isEmpty()) {
+                processFilePart(part, filename);
+            }
+        }
+    }
+
+    // Actions ------------------------------------------------------------------------------------
+
+    @Override
+    public Object get(Object key) {
+        Object value = super.get(key);
+        if (value instanceof String[]) {
+            String[] values = (String[]) value;
+            return values.length == 1 ? values[0] : Arrays.asList(values);
+        } else {
+            return value; // Can be File or null.
+        }
+    }
+
+    /**
+     * @see ServletRequest#getParameter(String)
+     */
+    public String getParameter(String name) {
+        Object value = super.get(name);
+        if (value instanceof File) {
+            return ((File) value).getName();
+        }
+        String[] values = (String[]) value;
+        return values != null ? values[0] : null;
+    }
+
+    /**
+     * @see ServletRequest#getParameterValues(String)
+     */
+    public String[] getParameterValues(String name) {
+        Object value = super.get(name);
+        if (value instanceof File) {
+            return new String[] { ((File) value).getName() };
+        }
+        return (String[]) value;
+    }
+
+    /**
+     * @see ServletRequest#getParameterNames()
+     */
+    public Enumeration<String> getParameterNames() {
+        return Collections.enumeration(keySet());
+    }
+
+    /**
+     * @see ServletRequest#getParameterMap()
+     */
+    public Map<String, String[]> getParameterMap() {
+        Map<String, String[]> map = new HashMap<String, String[]>();
+        for (Entry<String, Object> entry : entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof String[]) {
+                map.put(entry.getKey(), (String[]) value);
+            } else {
+                map.put(entry.getKey(), new String[] { ((File) value).getName() });
+            }
+        }
+        return map;
+    }
+
+    /**
+     * Returns uploaded file associated with given request parameter name.
+     * @param name Request parameter name to return the associated uploaded file for.
+     * @return Uploaded file associated with given request parameter name.
+     * @throws IllegalArgumentException If this field is actually a Text field.
+     */
+    public File getFile(String name) {
+        Object value = super.get(name);
+        if (value instanceof String[]) {
+            throw new IllegalArgumentException("This is a Text field. Use #getParameter() instead.");
+        }
+        return (File) value;
+    }
+
+    // Helpers ------------------------------------------------------------------------------------
+
+    /**
+     * Returns the filename from the content-disposition header of the given part.
+     */
+    private String getFilename(Part part) {
+        for (String cd : part.getHeader(CONTENT_DISPOSITION).split(";")) {
+            if (cd.trim().startsWith(CONTENT_DISPOSITION_FILENAME)) {
+                return cd.substring(cd.indexOf('=') + 1).trim().replace("\"", "");
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the text value of the given part.
+     */
+    private String getValue(Part part) throws IOException {
+        BufferedReader reader = 
+            new BufferedReader(new InputStreamReader(part.getInputStream(), encoding));
+        StringBuilder value = new StringBuilder();
+        char[] buffer = new char[DEFAULT_BUFFER_SIZE];
+        for (int length = 0; (length = reader.read(buffer)) > 0;) {
+            value.append(buffer, 0, length);
+        }
+        return value.toString();
+    }
+
+    /**
+     * Process given part as Text part.
+     */
+    private void processTextPart(Part part) throws IOException {
+        String name = part.getName();
+        String[] values = (String[]) super.get(name);
+
+        if (values == null) {
+            // Not in parameter map yet, so add as new value.
+            put(name, new String[] { getValue(part) });
+        } else {
+            // Multiple field values, so add new value to existing array.
+            int length = values.length;
+            String[] newValues = new String[length + 1];
+            System.arraycopy(values, 0, newValues, 0, length);
+            newValues[length] = getValue(part);
+            put(name, newValues);
+        }
+    }
+
+    /**
+     * Process given part as File part which is to be saved in temp dir with the given filename.
+     */
+    private void processFilePart(Part part, String filename) throws IOException {
+        // First fix stupid MSIE behaviour (it passes full client side path along filename).
+        filename = filename
+            .substring(filename.lastIndexOf('/') + 1)
+            .substring(filename.lastIndexOf('\\') + 1);
+
+        // Get filename prefix (actual name) and suffix (extension).
+        String prefix = filename;
+        String suffix = "";
+        if (filename.contains(".")) {
+            prefix = filename.substring(0, filename.lastIndexOf('.'));
+            suffix = filename.substring(filename.lastIndexOf('.'));
+        }
+
+        // Write uploaded file.
+        File file = File.createTempFile(prefix + "_", suffix, new File(location));
+        if (multipartConfigured) {
+            part.write(file.getName()); // Will be written to the very same File.
+        } else {
+            InputStream input = null;
+            OutputStream output = null;
+            try {
+                input = new BufferedInputStream(part.getInputStream(), DEFAULT_BUFFER_SIZE);
+                output = new BufferedOutputStream(new FileOutputStream(file), DEFAULT_BUFFER_SIZE);
+                byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+                for (int length = 0; ((length = input.read(buffer)) > 0);) {
+                    output.write(buffer, 0, length);
+                }
+            } finally {
+                if (output != null) try { output.close(); } catch (IOException logOrIgnore) { /**/ }
+                if (input != null) try { input.close(); } catch (IOException logOrIgnore) { /**/ }
+            }
+        }
+
+        put(part.getName(), file);
+        part.delete(); // Cleanup temporary storage.
+    }
+
+}package com.onewifi.service;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.util.Iterator;
+import java.util.List;
+import java.io.FileNotFoundException;
+
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+
+import com.onewifi.beans.*;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import net.sf.json.JSONObject;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
+
+public class OneWifiService {
+		
+	private static final int DEFAULT_BUFFER_SIZE = 10240; // 10KB.
+	private static final String CONTENT_DISPOSITION = "content-disposition";
+	private static final String CONTENT_DISPOSITION_FILENAME = "filename";
+
+	/**
+     * Returns the filename from the content-disposition header of the given part.
+     */
+    private String getFilename(Part part) {
+        for (String cd : part.getHeader(CONTENT_DISPOSITION).split(";")) {
+            if (cd.trim().startsWith(CONTENT_DISPOSITION_FILENAME)) {
+                return cd.substring(cd.indexOf('=') + 1).trim().replace("\"", "");
+            }
+        }
+        return null;
+    }
+	
+	public String uploadDevices(File[] files) throws Exception {
+		
+		HSSFWorkbook workbook = null;
+		HSSFSheet sheet = null;
+		XSSFWorkbook xworkbook = null;
+		XSSFSheet xsheet = null;
+		Iterator<Row> rowIterator = null;	
+		String filename = null;
+		String extension = null;
+		FileInputStream xlsFile = null;
+		StringBuffer result = new StringBuffer("");
+		DevicemasterHome deviceMasterHome = new DevicemasterHome();
+		Statuscodemaster statuscode = new Statuscodemaster();
+		statuscode.setStatusCode("S1");
+		Devicemaster devicemaster = null;
+		GlocalmeClient client = new GlocalmeClient();
+		
+		for(int k=0; files!=null && k < files.length; k++) { 		
+			
+			try {		 
+				if(files[k]!=null) {
+					xlsFile = new FileInputStream(files[k]);
+					
+					filename = files[k].getName();
+					extension = filename.substring(filename.lastIndexOf('.'));
+					if(extension.equals(".xls")) {
+						workbook = new HSSFWorkbook(xlsFile);
+						sheet = workbook.getSheetAt(0);
+						rowIterator = sheet.iterator();
+					} else if(extension.equals(".xlsx")) {
+						xworkbook = new XSSFWorkbook(xlsFile);
+						xsheet = xworkbook.getSheetAt(0);
+						rowIterator = xsheet.iterator();
+					}
+					 
+					for(int i=0; rowIterator.hasNext(); i++) {
+						Row row = rowIterator.next();				
+						if(i>=2) {					 
+							//For each row, iterate through each columns
+							Iterator<Cell> cellIterator = row.cellIterator();
+							boolean data = false;
+							for(int j=0;cellIterator.hasNext(); j++) {
+								 
+								Cell cell = cellIterator.next();
+								if(data || (cell.getColumnIndex()==0 && cell.getCellType()!=Cell.CELL_TYPE_BLANK)) {
+									if(j==0) {
+										devicemaster = new Devicemaster();
+										devicemaster.setStatuscodemaster(statuscode);
+									}
+									switch(cell.getCellType()) {
+										case Cell.CELL_TYPE_NUMERIC:
+											System.out.print(cell.getNumericCellValue() + " number \t\t");
+											break;
+										case Cell.CELL_TYPE_STRING:
+											System.out.print(cell.getStringCellValue() + " string \t\t");
+											break;
+									}
+									if(cell.getCellType()!=Cell.CELL_TYPE_BLANK) {
+										if(j==0) {
+											devicemaster.setUserCode(cell.getStringCellValue().trim());							
+										} else if(j==1) {
+											devicemaster.setImei(cell.getStringCellValue().substring(1).trim());	
+										} else if(j==2) {
+											devicemaster.setDeviceSerialNo(cell.getStringCellValue().trim());	
+										} else if(j==3) {
+											devicemaster.setPassword(cell.getStringCellValue().trim());	
+										} else if(j==4) {
+											devicemaster.setPartnerCode(cell.getStringCellValue().trim());	
+										}
+									}
+									data = true;
+								} else {
+									devicemaster = null;
+									data = false;
+									break;
+								}
+							}					
+							if(devicemaster!=null) {
+								System.out.println("\n\n\n");
+								JSONObject retObj = client.invokeUserBinding(devicemaster.getPartnerCode(), devicemaster.getUserCode(), devicemaster.getImei(), devicemaster.getPassword(), "0");
+								System.out.println("\n\nHTTP POST Response:"+retObj.toString());
+								//if(retObj.getString("resultCode").equals("0000")) {
+									JSONObject ret1Obj = client.invokeUserBinding(devicemaster.getPartnerCode(), devicemaster.getUserCode(), devicemaster.getImei(), devicemaster.getPassword(), "1");
+									System.out.println("\n\nHTTP POST Response:"+ret1Obj.toString());
+									//if(ret1Obj.getString("resultCode").equals("0000")) {
+										devicemaster.setDeviceId("D"+i);
+										deviceMasterHome.persist(devicemaster);																					
+									/*} else {
+										result.append(devicemaster.getImei() + " is not added due to an error when testing the de-activation. Result code is: "+ret1Obj.getString("resultCode")+ ". Result description is: "+ ret1Obj.getString("resultDesc")+".\n\n");
+									}
+								} else {
+									result.append(devicemaster.getImei() + " is not added due to an error when testing the activation. Result code is: "+retObj.getString("resultCode")+ ". Result description is: "+ retObj.getString("resultDesc")+".\n\n");
+								}*/
+								
+							} 
+						}							
+					}	
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw e;
+			} 
+		}
+		return result.toString();
+	}
+	
+	public String uploadRetailers(File[] files) throws Exception {
+		
+		HSSFWorkbook workbook = null;
+		HSSFSheet sheet = null;
+		XSSFWorkbook xworkbook = null;
+		XSSFSheet xsheet = null;
+		Iterator<Row> rowIterator = null;	
+		String filename = null;
+		String extension = null;
+		FileInputStream xlsFile = null;
+		StringBuffer result = new StringBuffer("");
+		RetailermasterHome retailermasterHome = new RetailermasterHome();
+		UserroleHome userroleHome = new UserroleHome();
+		Retailermaster retailermaster = null;
+		UserroleId userroleId = null;
+		Userrole userrole = null;			
+		
+		for(int k=0; files!=null && k < files.length; k++) { 		
+			
+			try {		 
+				if(files[k]!=null) {
+					xlsFile = new FileInputStream(files[k]);
+					
+					filename = files[k].getName();
+					extension = filename.substring(filename.lastIndexOf('.'));
+					if(extension.equals(".xls")) {
+						workbook = new HSSFWorkbook(xlsFile);
+						sheet = workbook.getSheetAt(1);
+						rowIterator = sheet.iterator();
+					} else if(extension.equals(".xlsx")) {
+						xworkbook = new XSSFWorkbook(xlsFile);
+						xsheet = xworkbook.getSheetAt(1);
+						rowIterator = xsheet.iterator();
+					}
+					 
+					for(int i=0; rowIterator.hasNext(); i++) {
+						Row row = rowIterator.next();				
+						if(i>=1) {					 
+							//For each row, iterate through each columns
+							Iterator<Cell> cellIterator = row.cellIterator();
+							boolean data = false;
+							for(int j=0;cellIterator.hasNext(); j++) {
+								 
+								Cell cell = cellIterator.next();
+								if(data || (cell.getColumnIndex()==0 && cell.getCellType()!=Cell.CELL_TYPE_BLANK)) {
+									if(j==0) {
+										retailermaster = new Retailermaster();
+										userroleId = new UserroleId();
+										userrole = new Userrole();
+									}
+									switch(cell.getCellType()) {
+										case Cell.CELL_TYPE_NUMERIC:
+											System.out.print(cell.getNumericCellValue() + " number \t\t");
+											break;
+										case Cell.CELL_TYPE_STRING:
+											System.out.print(cell.getStringCellValue() + " string \t\t");
+											break;
+									}
+									if(cell.getCellType()!=Cell.CELL_TYPE_BLANK) {
+										if(j==0) {
+											retailermaster.setRetailerId(cell.getStringCellValue().trim());							
+										} else if(j==1) {
+											retailermaster.setCoyRetailerName(cell.getStringCellValue().trim());	
+										} else if(j==2) {
+											retailermaster.setCoyContactNumber(new Integer((int)cell.getNumericCellValue()));	
+										} else if(j==3) {
+											retailermaster.setDirectorName(cell.getStringCellValue().trim());	
+										} else if(j==4) {
+											retailermaster.setIdentityId(cell.getStringCellValue().trim());	
+										} else if(j==5) {
+											retailermaster.setAddress(cell.getStringCellValue().trim());	
+										} else if(j==6) {
+											retailermaster.setRetailerContactNumber(new Integer((int)cell.getNumericCellValue()));	
+										} else if(j==7) {
+											retailermaster.setLoginId(cell.getStringCellValue().trim());	
+											userroleId.setLoginId(cell.getStringCellValue().trim());
+											userroleId.setRoleName("Retailer");
+										} else if(j==8) {
+											retailermaster.setUserName(cell.getStringCellValue().trim());	
+										} else if(j==9) {
+											retailermaster.setPassword(GenerateHash.generateHash(cell.getStringCellValue().trim()));								
+										}
+									}
+									data = true;
+								} else {
+									retailermaster = null;
+									data = false;
+									break;
+								}
+							}					
+							if(retailermaster!=null) {
+								System.out.println("\n\n\n");
+								retailermaster.setCreationDate(new java.util.Date());
+								retailermaster.setSecretQuestion1("What is my first school name");
+								retailermaster.setSecretQuestionAnswer1("testing");
+								retailermaster.setSecretQuestion2("What is my best friend name");
+								retailermaster.setSecretQuestionAnswer2("testing");
+								retailermasterHome.persist(retailermaster);																					
+								
+								userrole.setId(userroleId);
+								userroleHome.persist(userrole);
+								
+								result.append("Retailers have been added.\n\n");
+								
+							} 
+						}							
+					}	
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw e;
+			} 
+		}
+		return result.toString();
+	}
+	
+	public String uploadRetailerDevices(File[] files) throws Exception {
+		
+		HSSFWorkbook workbook = null;
+		HSSFSheet sheet = null;
+		XSSFWorkbook xworkbook = null;
+		XSSFSheet xsheet = null;
+		Iterator<Row> rowIterator = null;	
+		String filename = null;
+		String extension = null;
+		FileInputStream xlsFile = null;
+		StringBuffer result = new StringBuffer("");
+		RetailerdeviceHome retailerdeviceHome = new RetailerdeviceHome();
+		Retailerdevice retailerdevice = null;
+		RetailerdeviceId retailerdeviceId = null;
+		DevicemasterHome deviceMasterHome = new DevicemasterHome();
+		Statuscodemaster statuscode = new Statuscodemaster();
+		statuscode.setStatusCode("S3");
+		Devicemaster devicemaster = null;
+		
+		for(int k=0; files!=null && k < files.length; k++) { 		
+			
+			try {		 
+				if(files[k]!=null) {
+					xlsFile = new FileInputStream(files[k]);
+					
+					filename = files[k].getName();
+					extension = filename.substring(filename.lastIndexOf('.'));
+					if(extension.equals(".xls")) {
+						workbook = new HSSFWorkbook(xlsFile);
+						sheet = workbook.getSheetAt(2);
+						rowIterator = sheet.iterator();
+					} else if(extension.equals(".xlsx")) {
+						xworkbook = new XSSFWorkbook(xlsFile);
+						xsheet = xworkbook.getSheetAt(2);
+						rowIterator = xsheet.iterator();
+					}
+					 
+					for(int i=0; rowIterator.hasNext(); i++) {
+						Row row = rowIterator.next();				
+						if(i>=2) {					 
+							//For each row, iterate through each columns
+							Iterator<Cell> cellIterator = row.cellIterator();
+							boolean data = false;
+							for(int j=0;cellIterator.hasNext(); j++) {
+								 
+								Cell cell = cellIterator.next();
+								if(data || (cell.getColumnIndex()==0 && cell.getCellType()!=Cell.CELL_TYPE_BLANK)) {
+									if(j==0) {
+										retailerdevice = new Retailerdevice();
+										retailerdeviceId = new RetailerdeviceId();
+									}
+									switch(cell.getCellType()) {
+										case Cell.CELL_TYPE_NUMERIC:
+											System.out.print(cell.getNumericCellValue() + " number \t\t");
+											break;
+										case Cell.CELL_TYPE_STRING:
+											System.out.print(cell.getStringCellValue() + " string \t\t");
+											break;
+									}
+									if(cell.getCellType()!=Cell.CELL_TYPE_BLANK) {
+										if(j==0) {
+											retailerdeviceId.setAssignerId(cell.getStringCellValue().trim());							
+										} else if(j==1) {
+											retailerdeviceId.setDeviceSerialNo(cell.getStringCellValue().trim());	
+										} else if(j==2) {
+											retailerdeviceId.setPurpose(cell.getStringCellValue().trim());	
+										} else if(j==3) {
+											retailerdeviceId.setDays(new Double(cell.getNumericCellValue()));	
+										} else if(j==4) {
+											retailerdeviceId.setPrice(new Double(cell.getNumericCellValue()));	
+										}										
+									}
+									data = true;
+								} else {
+									retailerdevice = null;
+									retailerdeviceId = null;
+									data = false;
+									break;
+								}
+							}					
+							if(retailerdeviceId!=null) {
+								System.out.println("\n\n\n");
+								retailerdevice.setId(retailerdeviceId);
+								retailerdeviceHome.persist(retailerdevice);																					
+								result.append("Retailer Devices have been added.\n\n");
+							}
+						}							
+					}	
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw e;
+			} 
+		}
+		return result.toString();
+	}
+	
+	public String uploadPricing(File[] files) throws Exception {
+		
+		HSSFWorkbook workbook = null;
+		HSSFSheet sheet = null;
+		XSSFWorkbook xworkbook = null;
+		XSSFSheet xsheet = null;
+		Iterator<Row> rowIterator = null;	
+		String filename = null;
+		String extension = null;
+		FileInputStream xlsFile = null;
+		StringBuffer result = new StringBuffer("");
+		PricingHome pricingHome = new PricingHome();
+		PricingId pricingId = null;
+		Pricing pricing = null;
+		
+		for(int k=0; files!=null && k < files.length; k++) { 		
+			
+			try {		 
+				if(files[k]!=null) {
+					xlsFile = new FileInputStream(files[k]);
+					
+					filename = files[k].getName();
+					extension = filename.substring(filename.lastIndexOf('.'));
+					if(extension.equals(".xls")) {
+						workbook = new HSSFWorkbook(xlsFile);
+						sheet = workbook.getSheetAt(3);
+						rowIterator = sheet.iterator();
+					} else if(extension.equals(".xlsx")) {
+						xworkbook = new XSSFWorkbook(xlsFile);
+						xsheet = xworkbook.getSheetAt(3);
+						rowIterator = xsheet.iterator();
+					}
+					 
+					for(int i=0; rowIterator.hasNext(); i++) {
+						Row row = rowIterator.next();				
+						if(i>=1) {					 
+							//For each row, iterate through each columns
+							Iterator<Cell> cellIterator = row.cellIterator();
+							boolean data = false;
+							for(int j=0;cellIterator.hasNext(); j++) {
+								 
+								Cell cell = cellIterator.next();
+								if(data || (cell.getColumnIndex()==0 && cell.getCellType()!=Cell.CELL_TYPE_BLANK)) {
+									if(j==0) {
+										pricingId = new PricingId();
+										pricing = new Pricing();
+									}
+									switch(cell.getCellType()) {
+										case Cell.CELL_TYPE_NUMERIC:
+											System.out.print(cell.getNumericCellValue() + " number \t\t");
+											break;
+										case Cell.CELL_TYPE_STRING:
+											System.out.print(cell.getStringCellValue() + " string \t\t");
+											break;
+									}
+									if(cell.getCellType()!=Cell.CELL_TYPE_BLANK) {
+										if(j==0) {
+											pricingId.setValidDate(cell.getDateCellValue());							
+										} else if(j==1) {
+											pricingId.setProductCode(cell.getStringCellValue().trim());	
+										} else if(j==2) {
+											pricingId.setCountry(cell.getStringCellValue().trim());	
+										} else if(j==3) {
+											pricingId.setPayAsYouGo(new Double(cell.getNumericCellValue()));	
+										} else if(j==4) {
+											pricingId.setDaily150mb(new Double(cell.getNumericCellValue()));	
+										} else if(j==5) {
+											pricingId.setDays7450mb(new Double(cell.getNumericCellValue()));	
+										} else if(j==6) {
+											pricingId.setDays301gb(new Double(cell.getNumericCellValue()));	
+										} else if(j==7) {
+											pricingId.setDays902gb(new Double(cell.getNumericCellValue()));	
+										} else if(j==8) {
+											pricingId.setDays1803gb(new Double(cell.getNumericCellValue()));	
+										}
+									}
+									data = true;
+								} else {
+									pricingId = null;
+									pricing = null;
+									data = false;
+									break;
+								}
+							}					
+							if(pricingId!=null) {
+								System.out.println("\n\n\n");
+								pricingId.setPricingId("P1");
+								pricing.setId(pricingId);
+								pricingHome.persist(pricing);																					
+								result.append("Pricing details have been added.\n\n");									
+							}
+						}							
+					}	
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw e;
+			} 
+		}
+		return result.toString();
+	}
+			
+	public File[] getFiles(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		File[] files =  null;
+		try {
+			files = new File[request.getParts().size()];
+			int i = 0;
+			for (Part part : request.getParts()) {			
+				// Write uploaded file.			
+				String filename = getFilename(part);
+				if(filename!=null && !filename.equals("")) {
+					System.out.println("filename="+filename);
+					filename = filename.substring(filename.lastIndexOf('/') + 1).substring(filename.lastIndexOf('\\') + 1);
+				
+					String prefix = filename;
+					String suffix = "";
+					if (filename.contains(".")) {
+						prefix = filename.substring(0, filename.lastIndexOf('.'));
+						suffix = filename.substring(filename.lastIndexOf('.'));
+					}
+
+					files[i] = File.createTempFile(prefix + "_", suffix, new File(request.getServletContext().getRealPath("/pages/")));
+					InputStream input = new BufferedInputStream(part.getInputStream(), DEFAULT_BUFFER_SIZE);
+					OutputStream output = new BufferedOutputStream(new FileOutputStream(files[i++]), DEFAULT_BUFFER_SIZE);
+					byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+					for (int length = 0; ((length = input.read(buffer)) > 0);) {
+						output.write(buffer, 0, length);
+					}				
+					if (output != null) output.close(); 
+					if (input != null) input.close(); 
+					part.delete();
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		
+		return files;
+	}
+
+	public String saveCustomer(Customermaster customermaster) throws Exception {
+		String result = "Customer details cannot be saved";
+		try {
+			CustomermasterHome customermasterHome = new CustomermasterHome();
+			Statuscodemaster statuscode = new Statuscodemaster();
+			statuscode.setStatusCode("S12");
+			customermaster.setCreationDate(new java.util.Date());
+			customermaster.setSecretQuestion1("What is my first school name");
+			customermaster.setSecretQuestionAnswer1("testing");
+			customermaster.setSecretQuestion2("What is my best friend name");
+			customermaster.setSecretQuestionAnswer2("testing");
+			customermaster.setStatuscodemaster(statuscode);
+			customermaster.setCustomerId("C1");
+			customermaster.setPassword(" ");
+			customermasterHome.persist(customermaster);
+
+			UserroleHome userroleHome = new UserroleHome();
+			UserroleId userroleId = new UserroleId();
+			Userrole userrole = new Userrole();			
+			userroleId.setLoginId(customermaster.getLoginId());
+			userroleId.setRoleName("User");
+			userrole.setId(userroleId);
+			userroleHome.persist(userrole);		
+			
+			CustomerdeviceHome customerdeviceHome = new CustomerdeviceHome();
+			CustomerdeviceId customerdeviceId = null;
+			Customerdevice customerdevice = null;
+			
+			DevicemasterHome deviceMasterHome = new DevicemasterHome();
+			Devicemaster devicemaster = new Devicemaster();
+			devicemaster.setImei(customermaster.getImei());
+			List<Devicemaster> listDeviceMaster = deviceMasterHome.findByExample(devicemaster);
+			Statuscodemaster statuscode1 = new Statuscodemaster();
+			statuscode1.setStatusCode("S4");
+			for(Devicemaster devicemaster1 : listDeviceMaster) {
+				devicemaster1.setStatuscodemaster(statuscode1);
+				deviceMasterHome.merge(devicemaster1);
+				
+				customerdeviceId = new CustomerdeviceId();
+				customerdevice = new Customerdevice();
+				customerdeviceId.setCustomerId(customermaster.getCustomerId());
+				customerdeviceId.setDeviceId(devicemaster1.getDeviceId());
+				customerdeviceId.setStatusCode(statuscode1.getStatusCode());
+				customerdevice.setId(customerdeviceId);
+				customerdevice.setStatuscodemaster(statuscode1);
+				customerdeviceHome.persist(customerdevice);
+			}			
+			result = "Customer saved successfully";
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return result;
+	}
+
+	public UserroleId authenticateUser(String loginId, String password) throws Exception {
+		UserroleId userroleId = null;
+		try {	
+			String psdHash = GenerateHash.generateHash(password);
+			UserroleHome userroleHome = new UserroleHome();
+			UserroleId userroleId1 = new UserroleId();
+			userroleId1.setLoginId(loginId);
+			Userrole userrole = userroleHome.findById(userroleId);
+			boolean authenticated = false;
+			if(userrole!=null && userrole.getId()!=null) {
+				if(userrole.getId().getRoleName().equals("Partner")) {
+					PartnermasterHome partnermasterHome = new PartnermasterHome();
+					Partnermaster partnermaster = new Partnermaster();
+					partnermaster.setLoginId(loginId);
+					List<Partnermaster> listPartnermaster = partnermasterHome.findByExample(partnermaster);
+					for(Partnermaster partnermaster1 : listPartnermaster) {
+						if(partnermaster1.getPassword().equals(psdHash)) {
+							authenticated = true;
+							userroleId = userrole.getId();
+							break;
+						}
+					}
+				} else if(userrole.getId().getRoleName().equals("Retailer")) {
+					RetailermasterHome retailermasterHome = new RetailermasterHome();
+					Retailermaster retailermaster = new Retailermaster();
+					retailermaster.setLoginId(loginId);
+					List<Retailermaster> listRetailermaster = retailermasterHome.findByExample(retailermaster);
+					for(Retailermaster retailermaster1 : listRetailermaster) {
+						if(retailermaster1.getPassword().equals(psdHash)) {
+							authenticated = true;
+							userroleId = userrole.getId();
+							break;
+						}
+					}
+				} else if(userrole.getId().getRoleName().equals("User")) {
+					CustomermasterHome customermasterHome = new CustomermasterHome();
+					Customermaster customermaster = new Customermaster();
+					customermaster.setLoginId(loginId);
+					List<Customermaster> listCustomermaster = customermasterHome.findByExample(customermaster);
+					for(Customermaster customermaster1 : listCustomermaster) {
+						if(customermaster1.getPassword().equals(psdHash)) {
+							authenticated = true;
+							userroleId = userrole.getId();
+							break;
+						}
+					}
+
+				}
+			}
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return userroleId;
+	}
+	
+	public Boolean changePassword(String loginId, String password, String userRoleName) throws Exception {
+		Boolean psdChanged = null;
+		try {	
+			String psdHash = GenerateHash.generateHash(password);
+			UserroleHome userroleHome = new UserroleHome();
+			UserroleId userroleId = new UserroleId();
+			userroleId.setLoginId(loginId);
+			Userrole userrole = userroleHome.findById(userroleId);
+			boolean authenticated = false;
+			if(userrole!=null && userrole.getId()!=null) {
+				if(userrole.getId().getRoleName().equals("Partner")) {
+					PartnermasterHome partnermasterHome = new PartnermasterHome();
+					Partnermaster partnermaster = new Partnermaster();
+					partnermaster.setLoginId(loginId);
+					List<Partnermaster> listPartnermaster = partnermasterHome.findByExample(partnermaster);
+					for(Partnermaster partnermaster1 : listPartnermaster) {
+						partnermaster1.setPassword(psdHash);
+						partnermasterHome.merge(partnermaster1);
+						psdChanged = new Boolean(true);
+						break;
+					}
+				} else if(userrole.getId().getRoleName().equals("Retailer")) {
+					RetailermasterHome retailermasterHome = new RetailermasterHome();
+					Retailermaster retailermaster = new Retailermaster();
+					retailermaster.setLoginId(loginId);
+					List<Retailermaster> listRetailermaster = retailermasterHome.findByExample(retailermaster);
+					for(Retailermaster retailermaster1 : listRetailermaster) {
+						retailermaster1.setPassword(psdHash);
+						retailermasterHome.merge(retailermaster1);
+						psdChanged = new Boolean(true);					
+						break;
+					}				
+				} else if(userrole.getId().getRoleName().equals("User")) {
+					CustomermasterHome customermasterHome = new CustomermasterHome();
+					Customermaster customermaster = new Customermaster();
+					customermaster.setLoginId(loginId);
+					List<Customermaster> listCustomermaster = customermasterHome.findByExample(customermaster);
+					for(Customermaster customermaster1 : listCustomermaster) {
+						customermaster1.setPassword(psdHash);
+						customermasterHome.merge(customermaster1);
+						psdChanged = new Boolean(true);					
+						break;
+					}
+				}
+			}
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return psdChanged;
+	}
+
+	public Boolean validateDevice(String loginId, String IMEI, String deviceSerialNo) throws Exception {
+		Boolean deviceValid = null;
+		try {	
+			CustomermasterHome customermasterHome = new CustomermasterHome();
+			Customermaster customermaster = new Customermaster();
+			customermaster.setLoginId(loginId);
+			List<Customermaster> listCustomermaster = customermasterHome.findByExample(customermaster);
+			for(Customermaster customermaster1 : listCustomermaster) {
+				CustomerdeviceHome customerdeviceHome = new CustomerdeviceHome();
+				CustomerdeviceId customerdeviceId = new CustomerdeviceId();
+				customerdeviceId.setCustomerId(customermaster1.getCustomerId());
+				Customerdevice customerdevice = customerdeviceHome.findById(customerdeviceId);
+				if(customerdevice!=null && customerdevice.getId()!=null) {
+					DevicemasterHome deviceMasterHome = new DevicemasterHome();
+					Devicemaster devicemaster = new Devicemaster();
+					devicemaster.setDeviceId(customerdevice.getId().getDeviceId());
+					List<Devicemaster> listDeviceMaster = deviceMasterHome.findByExample(devicemaster);
+					for(Devicemaster devicemaster1 : listDeviceMaster) {
+						if(devicemaster1.getImei().equals(IMEI) && devicemaster1.getDeviceSerialNo().equals(deviceSerialNo)) {
+							deviceValid = new Boolean(true);
+							break;
+						}
+					}
+				}
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return deviceValid;
+	}	
+	
+	public Partnermaster fetchPartnerDetails(String loginId) throws Exception {
+		Partnermaster partnermasterResult = null;
+		try {	
+			PartnermasterHome partnermasterHome = new PartnermasterHome();
+			Partnermaster partnermaster = new Partnermaster();
+			partnermaster.setLoginId(loginId);
+			List<Partnermaster> listPartnermaster = partnermasterHome.findByExample(partnermaster);
+			for(Partnermaster partnermaster1 : listPartnermaster) {
+				partnermasterResult = partnermaster1;
+				break;
+			}			
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return partnermasterResult;
+	}
+
+	public Retailermaster fetchRetailerDetails(String loginId) throws Exception {
+		Retailermaster retailermasterResult = null;
+		try {	
+			RetailermasterHome retailermasterHome = new RetailermasterHome();
+			Retailermaster retailermaster = new Retailermaster();
+			retailermaster.setLoginId(loginId);
+			List<Retailermaster> listRetailermaster = retailermasterHome.findByExample(retailermaster);
+			for(Retailermaster retailermaster1 : listRetailermaster) {
+				retailermasterResult = retailermaster1;
+				break;
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return retailermasterResult;
+	}
+
+	public Customermaster fetchCustomerDetails(String loginId) throws Exception {
+		Customermaster customermasterResult = null;
+		try {	
+			CustomermasterHome customermasterHome = new CustomermasterHome();
+			Customermaster customermaster = new Customermaster();
+			customermaster.setLoginId(loginId);
+			List<Customermaster> listCustomermaster = customermasterHome.findByExample(customermaster);
+			for(Customermaster customermaster1 : listCustomermaster) {
+				customermasterResult = customermaster1;
+				break;
+			}			
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return customermasterResult;
+	}
+}
+package com.onewifi.service;
+
+import java.io.File;
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import javax.servlet.MultipartConfigElement;
+import javax.servlet.annotation.MultipartConfig;
+
+import com.onewifi.beans.*;
+
+@WebServlet(name = "UploadServlet", urlPatterns = {"/uploadServlet"})
+@MultipartConfig(fileSizeThreshold=1024*1024, maxFileSize=1024*1024*5, maxRequestSize=1024*1024*5*5)
+public class UploadServlet extends HttpServlet {
+	
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException
+    {
+        request.getRequestDispatcher("/pages/upload.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException
+    {
+		try {
+			OneWifiService oneWifiService = new OneWifiService();
+			if(request.getParameter("action").equals("BuyDevice")) {		
+				Customermaster customermaster = new Customermaster();
+				customermaster.setIdentityType("NRIC");
+				customermaster.setIdentityId("S1234567Z");
+				customermaster.setIdentityImage(new String("NRIC_Image").getBytes());
+				customermaster.setFullName("John M");
+				customermaster.setLoginId("test@gmail.com");
+				customermaster.setAddress("Blk 245|Singapore|");
+				customermaster.setContactNo(12345679);
+				customermaster.setImei("356166060296562");
+				System.out.println("1");
+				oneWifiService.saveCustomer(customermaster);
+			} else {
+				File[] files = oneWifiService.getFiles(request, response);
+		
+				if(files!=null  && files.length>0) {
+				
+					if(request.getParameter("action").equals("Devices")) {		
+					
+						String result = oneWifiService.uploadDevices(files);
+						
+						result = oneWifiService.uploadRetailerDevices(files);					
+						result = oneWifiService.uploadRetailers(files);
+						result = oneWifiService.uploadPricing(files);
+						
+						if(result.trim().equals("")) {
+							request.setAttribute("status", "success");					
+						} else {
+							request.setAttribute("status", "failure");		
+						}
+						request.setAttribute("result", result);
+						
+					} else if(request.getParameter("action").equals("Retailers")) {
+						
+						String result = oneWifiService.uploadRetailers(files);
+						
+						if(result.trim().equals("")) {
+							request.setAttribute("status", "success");					
+						} else {
+							request.setAttribute("status", "failure");		
+						}
+						request.setAttribute("result", result);
+						
+					} else if(request.getParameter("action").equals("RetailerDevices")) {
+						
+						String result = oneWifiService.uploadRetailerDevices(files);
+						
+						if(result.trim().equals("")) {
+							request.setAttribute("status", "success");					
+						} else {
+							request.setAttribute("status", "failure");		
+						}
+						request.setAttribute("result", result);
+						
+					} else if(request.getParameter("action").equals("Pricing")) {
+					
+						String result = oneWifiService.uploadPricing(files);
+						
+						if(result.trim().equals("")) {
+							request.setAttribute("status", "success");					
+						} else {
+							request.setAttribute("status", "failure");		
+						}
+						request.setAttribute("result", result);
+						
+					}
+				}
+			}
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		
+        request.getRequestDispatcher("/pages/upload.jsp").forward(request, response);
+    }		
+}
